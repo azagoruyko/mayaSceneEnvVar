@@ -56,6 +56,6 @@ In order to use the script, run the following
 ```python
 createSceneEnvVar("assetName_path", 0) # depth=0-scene's folder, 1-parent folder, etc
 ```
-Where `assetName_path` can be any unique name you like for your character, `depth` specifies how many time it should go up relative to the current scene's folder.
-Use `depth=0` when you want the environment variable points to the scene's folder, `depth=1` points to the parent of the scene's folder, etc.
-Place the created transform node `sceneEnvVar` to any group you like or hide it from outliner.
+Where `assetName_path` can be any unique name you like for your character, `depth` specifies how many time it should go up relative to the current scene's folder.<br>
+Use `depth=0` when you want the environment variable points to the scene's folder, `depth=1` points to the parent of the scene's folder, etc.<br>
+Place created transform node `sceneEnvVar` to any group you like or hide it from outliner.

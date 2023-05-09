@@ -52,7 +52,7 @@ if secretNode:
             print("{} => {}".format(n, txPath))
 ```
 
-In order to use the script, run the following
+Run the following function to do the job.
 ```python
 createSceneEnvVar("assetName_path", 0) # depth=0-scene's folder, 1-parent folder, etc
 ```

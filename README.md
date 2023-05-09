@@ -1,4 +1,4 @@
-This script creates an environment variable for the current scene. It can be used in texutre's paths or wherever you want.<br> 
+This script creates an environment variable for the current scene. It can be used in texture paths.<br>
 Created `scriptNode` sets the environment variable when the scene is opened or referenced.
 
 ![image](https://github.com/azagoruyko/mayaSceneEnvVar/assets/9614751/6bbd7786-a437-4583-9c86-467da324a3bb)
@@ -58,3 +58,4 @@ createSceneEnvVar("assetName_path", 0) # depth=0-scene's folder, 1-parent folder
 ```
 Where `assetName_path` can be any unique name you like for your character, `depth` specifies how many time it should go up relative to the current scene's folder.
 Use `depth=0` when you want the environment variable points to the scene's folder, `depth=1` points to the parent of the scene's folder, etc.
+Place the created transform node `sceneEnvVar` to any group you like or hide it from outliner.

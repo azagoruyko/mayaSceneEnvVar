@@ -1,18 +1,15 @@
 This script creates an environment variable for the current scene. It can be used in texture paths.<br>
 Created `scriptNode` sets the environment variable when the scene is opened or referenced.
 
-![image](https://github.com/azagoruyko/mayaSceneEnvVar/assets/9614751/6bbd7786-a437-4583-9c86-467da324a3bb)
-
 ```python
 import pymel.core as pm
 import os
-import base64
 
 def n_dirname(path, n=0):
     parent = os.path.dirname(path)
     return parent if n <= 0 else n_dirname(parent, n-1)
     
-def createSceneEnvVar(sceneEnvVar, depth=0): # 0-scene's folder, 1-parent folder, etc
+def createSceneEnvVar(sceneEnvVar, depth=0): # 0-current asset folder, 1-parent folder, etc
     if pm.objExists(sceneEnvVar):
         pm.warning("'{}' already exists".format(sceneEnvVar))
         return
@@ -23,22 +20,27 @@ def createSceneEnvVar(sceneEnvVar, depth=0): # 0-scene's folder, 1-parent folder
         return
         
     code = '''
-import pymel.core as pm
-import os
+import maya.cmds as cmds
+import maya.OpenMaya as om
+
 def n_dirname(path, n=0):
-    parent = os.path.dirname(path)
+    dirname = lambda path: "/".join(path.split("/")[:-1])                  
+    parent = dirname(path)
     return parent if n <= 0 else n_dirname(parent, n-1)
-secretNode = pm.ls("$VAR", r=True)
+    
+secretNode = cmds.ls("$VAR", r=True)
 if secretNode:
-    refPath = secretNode[0].referenceFile() or pm.api.MFileIO.currentFile()
-    path = n_dirname(str(refPath), $DEPTH)
+    if cmds.referenceQuery(secretNode, isNodeReferenced=True):         
+        refNode = cmds.referenceQuery(secretNode, rfn=True)
+        refPath = cmds.referenceQuery(refNode, f=True)
+    else:
+        refPath = om.MFileIO.currentFile()
+               
+    path = n_dirname(refPath.replace("\\\\", "/"), $DEPTH)
     os.environ["$VAR"] = path
-    print("Set $VAR to '{}'".format(path))
-    '''.replace("$VAR", sceneEnvVar).replace("$DEPTH", str(depth))
-        
-    expr = "python(\"import base64;exec(base64.b64decode('{}'))\");".format(base64.b64encode(code))
-    pm.scriptNode(st=1, bs=expr, n="sceneEnv_scriptNode")
-        
+    print("Set $VAR to '{}'".format(path))'''.replace("$VAR", sceneEnvVar).replace("$DEPTH", str(depth))
+       
+    pm.scriptNode(st=1, bs=code, n="sceneEnv_scriptNode", stp="python")        
     pm.createNode("transform", n=sceneEnvVar) #  make secret node
     exec(code) # setup env
         
@@ -49,7 +51,7 @@ if secretNode:
          if txPath.startswith(sceneRoot):
             txPath = txPath.replace(sceneRoot, "$"+sceneEnvVar)
             n.fileTextureName.set(txPath)
-            print("{} => {}".format(n, txPath))
+            print("{} => {}".format(n, txPath))     
 ```
 
 Run the following function to do the job.
